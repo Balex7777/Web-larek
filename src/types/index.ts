@@ -1,29 +1,11 @@
-export interface IProduct {
-	id: string;
-	title: string;
-	image: string;
-	category: string;
-	description: string;
-	price: number;
-}
+import { IProduct } from '../components/Product';
 
 export interface IProductList {
 	products: IProduct[];
-	fetchData(): void;
+	setProducts(): void;
 }
 
-export interface ICart {
-	products: Map<string, IProduct>;
-	addProduct(id: string): void;
-	removeProduct(id: string): void;
-}
-
-export interface Order {
-	payment: string;
-	email: string;
-	phone: string;
-	address: string;
+export interface IOrderResult {
+	id: string;
 	total: number;
-	items: string[];
-	getProductsFromCart(cart: ICart): void;
 }
