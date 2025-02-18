@@ -11,8 +11,10 @@ export interface IOrderResult {
 	total: number;
 }
 
+export type Payment = 'online' | 'offline';
+
 export interface IOrderForm {
-	payment: string;
+	payment: Payment;
 	email: string;
 }
 
