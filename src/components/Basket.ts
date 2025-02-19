@@ -4,7 +4,7 @@ import { EventEmitter } from './base/events';
 import { IProduct } from './Product';
 
 export interface IBasket {
-	products: Map<string, IProduct>;
+	products: IProduct[];
 	total: number;
 	addProduct(id: string): void;
 	removeProduct(id: string): void;
@@ -12,7 +12,7 @@ export interface IBasket {
 
 interface IBasketView {
 	products: HTMLElement[];
-	total: number;
+	totalPrice: number;
 }
 
 export class Basket extends Component<IBasketView> {
@@ -46,7 +46,7 @@ export class Basket extends Component<IBasketView> {
 		}
 	}
 
-	set total(total: number) {
-		this.setText(this._price, total);
+	set totalPrice(totalPrice: number) {
+		this.setText(this._price, totalPrice);
 	}
 }
