@@ -1,4 +1,4 @@
-import { IOrderResult, IProductList, IOrder } from '../types';
+import { IOrderResult, IOrder, IProductList } from '../types';
 import { Api } from './base/api';
 import { IProduct } from './Product';
 
