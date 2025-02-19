@@ -43,7 +43,7 @@ events.on('items:changed', () => {
 		});
 		return card.render({
 			title: item.title,
-			image: item.image,
+			image: api.cdn + item.image,
 			description: item.description,
 			category: item.category,
 			price: item.price,
