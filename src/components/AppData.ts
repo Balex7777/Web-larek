@@ -19,6 +19,7 @@ export class AppState extends Model<IAppState> {
 	order: IOrder;
 	loading: boolean;
 	formErrors: formErrors = {};
+	preview: string | null;
 
 	getTotal() {
 		return this.order.items.reduce(
@@ -75,5 +76,10 @@ export class AppState extends Model<IAppState> {
 		this.formErrors = errors;
 		this.events.emit('formErrors:change', this.formErrors);
 		return Object.keys(errors).length === 0;
+	}
+
+	setPreview(item: IProduct) {
+		this.preview = item.id;
+		this.emitChanges('preview:changed', item);
 	}
 }

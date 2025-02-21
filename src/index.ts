@@ -1,4 +1,4 @@
-import { AppState } from './components/AppData';
+import { AppState, ProductItem } from './components/AppData';
 import { EventEmitter } from './components/base/events';
 import { Basket } from './components/Basket';
 import { Card } from './components/Card';
@@ -7,7 +7,7 @@ import { Success } from './components/common/Succes';
 import { LarekAPI } from './components/LarekAPI';
 import { Order } from './components/Order';
 import { Page } from './components/Page';
-import { IProduct } from './components/Product';
+import { IProduct, Product } from './components/Product';
 import './scss/styles.scss';
 import { IOrderForm, IProductList } from './types';
 import { API_URL, CDN_URL } from './utils/constants';
@@ -115,6 +115,46 @@ events.on('modal:open', () => {
 // ... и разблокируем
 events.on('modal:close', () => {
 	page.locked = false;
+});
+
+events.on('card:select', (item: ProductItem) => {
+	appData.setPreview(item);
+});
+
+events.on('preview:changed', (item: ProductItem) => {
+	const showItem = (item: ProductItem) => {
+		const product = new Card('card', cloneTemplate(cardPreviewTemplate));
+
+		modal.render({
+			content: product.render({
+				title: item.title,
+				image: api.cdn + item.image,
+				category: item.category,
+				description: item.description,
+				price: item.price,
+			}),
+		});
+	};
+
+	if (item) {
+		api
+			.getProduct(item.id)
+			.then((result) => {
+				item.description = result.description;
+				showItem(item);
+			})
+			.catch((err) => {
+				console.error(err);
+			});
+	} else {
+		modal.close();
+	}
+});
+
+events.on('basket:open', () => {
+	modal.render({
+		content: createElement<HTMLElement>('div', {}, [basket.render()]),
+	});
 });
 
 api

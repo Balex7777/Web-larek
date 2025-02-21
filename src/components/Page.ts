@@ -26,7 +26,7 @@ export class Page extends Component<IPage> {
 
 		if (this._basket) {
 			this._basket.addEventListener('click', () => {
-				console.log('open basket');
+				this.events.emit('basket:open');
 			});
 		}
 	}
