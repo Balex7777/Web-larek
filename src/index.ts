@@ -51,7 +51,7 @@ events.on('items:changed', () => {
 		});
 	});
 
-	// page.counter = appData.getBasketTotal();
+	page.counter = appData.basket.length;
 });
 
 events.on('order:submit', () => {
@@ -99,12 +99,6 @@ events.on('order:open', () => {
 	});
 });
 
-events.on('basket:open', () => {
-	modal.render({
-		content: createElement<HTMLElement>('div', {}, [basket.render()]),
-	});
-});
-
 // Блокируем прокрутку страницы если открыта модалка
 events.on('modal:open', () => {
 	page.locked = true;
@@ -122,7 +116,7 @@ events.on('card:select', (item: ProductItem) => {
 events.on('preview:changed', (item: ProductItem) => {
 	const showItem = (item: ProductItem) => {
 		const product = new Card('card', cloneTemplate(cardPreviewTemplate), {
-			onClick: () => events.emit('card:add', item),
+			onClick: () => events.emit('basket:push', item),
 		});
 
 		modal.render({
@@ -151,12 +145,18 @@ events.on('preview:changed', (item: ProductItem) => {
 	}
 });
 
-events.on('card:add', (item: ProductItem) => {
-	appData.addProductInBasket({
-		index: 1,
+events.on('basket:push', (item: ProductItem) => {
+	appData.addProduct({
+		index: appData.basket.length,
 		title: item.title,
 		price: item.price,
 	});
+	page.counter = appData.basket.length;
+});
+
+events.on('basket:delete', (item: IBasketElement) => {
+	appData.deleteProduct(item.index);
+	page.counter = appData.basket.length;
 });
 
 events.on('basket:open', () => {
