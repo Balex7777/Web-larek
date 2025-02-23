@@ -1,13 +1,14 @@
 import { AppState, ProductItem } from './components/AppData';
 import { EventEmitter } from './components/base/events';
 import { Basket } from './components/Basket';
+import { BasketElement, IBasketElement } from './components/BasketElement';
 import { Card } from './components/Card';
 import { Modal } from './components/common/Modal';
 import { Success } from './components/common/Succes';
 import { LarekAPI } from './components/LarekAPI';
 import { Order } from './components/Order';
 import { Page } from './components/Page';
-import { IProduct, Product } from './components/Product';
+import { IProduct } from './components/Product';
 import './scss/styles.scss';
 import { IOrderForm, IProductList } from './types';
 import { API_URL, CDN_URL } from './utils/constants';
@@ -50,7 +51,7 @@ events.on('items:changed', () => {
 		});
 	});
 
-	page.counter = appData.getBasketTotal();
+	// page.counter = appData.getBasketTotal();
 });
 
 events.on('order:submit', () => {
@@ -82,12 +83,9 @@ events.on('order:submit', () => {
 // 	order.errors = Object.values({phone, email}).filter(i => !!i).join('; ');
 // });
 
-events.on(
-	/^order\..*:change/,
-	(data: { field: keyof IOrderForm; value: string }) => {
-		appData.setOrderField(data.field, data.value);
-	}
-);
+events.on(/^order\..*:change/, (data: { field: keyof IOrderForm; value: string }) => {
+	appData.setOrderField(data.field, data.value);
+});
 
 // Открыть форму заказа
 events.on('order:open', () => {
@@ -123,7 +121,9 @@ events.on('card:select', (item: ProductItem) => {
 
 events.on('preview:changed', (item: ProductItem) => {
 	const showItem = (item: ProductItem) => {
-		const product = new Card('card', cloneTemplate(cardPreviewTemplate));
+		const product = new Card('card', cloneTemplate(cardPreviewTemplate), {
+			onClick: () => events.emit('card:add', item),
+		});
 
 		modal.render({
 			content: product.render({
@@ -151,9 +151,32 @@ events.on('preview:changed', (item: ProductItem) => {
 	}
 });
 
+events.on('card:add', (item: ProductItem) => {
+	appData.addProductInBasket({
+		index: 1,
+		title: item.title,
+		price: item.price,
+	});
+});
+
 events.on('basket:open', () => {
 	modal.render({
-		content: createElement<HTMLElement>('div', {}, [basket.render()]),
+		content: createElement<HTMLElement>('div', {}, [
+			basket.render({
+				products: appData.basket.reduce((array, item: IBasketElement, i) => {
+					const cardBasket = new BasketElement(cloneTemplate(cardBasketTemplate), events);
+					return [
+						...array,
+						cardBasket.render({
+							index: i + 1,
+							title: item.title,
+							price: item.price,
+						}),
+					];
+				}, []),
+				totalPrice: appData.basket.reduce((total, item) => total + item.price, 0),
+			}),
+		]),
 	});
 });
 
