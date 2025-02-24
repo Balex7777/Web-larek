@@ -119,4 +119,8 @@ export class AppState extends Model<IAppState> {
 		this.preview = item.id;
 		this.emitChanges('preview:changed', item);
 	}
+
+	hasInBasket(id: string) {
+		return this.basket.find((item) => item.id === id) !== undefined;
+	}
 }

@@ -68,7 +68,6 @@ events.on('order:submit', () => {
 });
 
 events.on('contacts:submit', () => {
-	console.log(appData.order);
 	api
 		.makeOrder(appData.order)
 		.then((result) => {
@@ -158,6 +157,7 @@ events.on('preview:changed', (item: ProductItem) => {
 				category: item.category,
 				description: item.description,
 				price: item.price,
+				disabled: !item.price || appData.hasInBasket(item.id) ? true : false,
 			}),
 		});
 	};
@@ -209,6 +209,7 @@ events.on('basket:open', () => {
 					];
 				}, []),
 				totalPrice: appData.basket.reduce((total, item) => total + item.price, 0),
+				disabled: appData.basket.length ? false : true,
 			}),
 		]),
 	});
