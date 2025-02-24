@@ -5,21 +5,22 @@ import { BasketElement, IBasketElement } from './components/BasketElement';
 import { Card } from './components/Card';
 import { Modal } from './components/common/Modal';
 import { Success } from './components/common/Succes';
+import { Contacts } from './components/Contacts';
 import { LarekAPI } from './components/LarekAPI';
 import { Order } from './components/Order';
 import { Page } from './components/Page';
 import { IProduct } from './components/Product';
 import './scss/styles.scss';
-import { IOrderForm, IProductList } from './types';
+import { IContacts, IOrderForm, IProductList } from './types';
 import { API_URL, CDN_URL } from './utils/constants';
 import { cloneTemplate, createElement, ensureElement } from './utils/utils';
 
 const events = new EventEmitter();
 const api = new LarekAPI(CDN_URL, API_URL);
 
-events.onAll(({ eventName, data }) => {
-	console.log(eventName, data);
-});
+// events.onAll(({ eventName, data }) => {
+// 	console.log(eventName, data);
+// });
 
 const successTemplate = ensureElement<HTMLTemplateElement>('#success');
 const cardCatalogTemplate = ensureElement<HTMLTemplateElement>('#card-catalog');
@@ -36,6 +37,7 @@ const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
 
 const basket = new Basket(cloneTemplate(basketTemplate), events);
 const order = new Order(cloneTemplate(orderTemplate), events);
+const contacts = new Contacts(cloneTemplate(contactsTemplate), events);
 
 events.on('items:changed', () => {
 	page.gallery = appData.gallery.map((item: IProduct) => {
@@ -55,6 +57,18 @@ events.on('items:changed', () => {
 });
 
 events.on('order:submit', () => {
+	modal.render({
+		content: contacts.render({
+			phone: '',
+			email: '',
+			valid: false,
+			errors: [],
+		}),
+	});
+});
+
+events.on('contacts:submit', () => {
+	console.log(appData.order);
 	api
 		.makeOrder(appData.order)
 		.then((result) => {
@@ -62,7 +76,7 @@ events.on('order:submit', () => {
 				onClick: () => {
 					modal.close();
 					appData.clearBasket();
-					events.emit('auction:changed');
+					page.counter = 0;
 				},
 			});
 
@@ -77,22 +91,40 @@ events.on('order:submit', () => {
 		});
 });
 
-// events.on('formErrors:change', (errors: Partial<IOrderForm>) => {
-// 	const { email, phone } = errors;
-// 	order.valid = !email && !phone;
-// 	order.errors = Object.values({phone, email}).filter(i => !!i).join('; ');
-// });
+events.on('formOrderErrors:change', (errors: Partial<IOrderForm>) => {
+	const { address } = errors;
+	order.valid = !address;
+	order.errors = Object.values({ address })
+		.filter((i) => !!i)
+		.join('; ');
+});
+
+events.on('formContactsErrors:change', (errors: Partial<IContacts>) => {
+	const { email, phone } = errors;
+	contacts.valid = !email && !phone;
+	contacts.errors = Object.values({ email, phone })
+		.filter((i) => !!i)
+		.join('; ');
+});
 
 events.on(/^order\..*:change/, (data: { field: keyof IOrderForm; value: string }) => {
 	appData.setOrderField(data.field, data.value);
 });
 
+events.on(/^contacts\..*:change/, (data: { field: keyof IContacts; value: string }) => {
+	appData.setContactsField(data.field, data.value);
+});
+
 // Открыть форму заказа
 events.on('order:open', () => {
+	appData.order.items = appData.basket.map((item) => item.id);
+	appData.order.total = appData.basket.reduce((sum, item) => item.price + sum, 0);
+
+	console.log(appData.order);
+
 	modal.render({
 		content: order.render({
-			phone: '',
-			email: '',
+			address: '',
 			valid: false,
 			errors: [],
 		}),
@@ -147,11 +179,13 @@ events.on('preview:changed', (item: ProductItem) => {
 
 events.on('basket:push', (item: ProductItem) => {
 	appData.addProduct({
+		id: item.id,
 		index: appData.basket.length,
 		title: item.title,
 		price: item.price,
 	});
 	page.counter = appData.basket.length;
+	modal.close();
 });
 
 events.on('basket:delete', (item: IBasketElement) => {

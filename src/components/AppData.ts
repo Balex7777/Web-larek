@@ -1,4 +1,12 @@
-import { formErrors, IAppState, IOrder, IProductList } from '../types';
+import {
+	formContactsErrors,
+	formOrderErrors,
+	IAppState,
+	IContacts,
+	IOrder,
+	IOrderForm,
+	IProductList,
+} from '../types';
 import { Model } from './base/Model';
 import { IBasketElement } from './BasketElement';
 import { IProduct } from './Product';
@@ -16,9 +24,17 @@ export class ProductItem extends Model<IProduct> {
 export class AppState extends Model<IAppState> {
 	basket: IBasketElement[] = [];
 	gallery: ProductItem[];
-	order: IOrder;
+	order: IOrder = {
+		payment: 'online',
+		address: '',
+		email: '',
+		total: 0,
+		phone: '',
+		items: [],
+	};
 	loading: boolean;
-	formErrors: formErrors = {};
+	formOrderErrors: formOrderErrors = {};
+	formContactsErrors: formContactsErrors = {};
 	preview: string | null;
 
 	getTotal() {
@@ -47,7 +63,6 @@ export class AppState extends Model<IAppState> {
 	}
 
 	deleteProduct(id: number) {
-		console.log(this.basket);
 		this.basket = this.basket.filter((item, i) => {
 			return i + 1 !== id;
 		});
@@ -55,32 +70,48 @@ export class AppState extends Model<IAppState> {
 	}
 
 	clearBasket() {
-		this.order.items.forEach((id) => {
-			this.toggleOrderedProduct(id, false);
-		});
+		this.basket = [];
 	}
 
-	setOrderField(field: keyof IOrder, value: string) {
-		console.log(this.order[field], field, value);
+	setOrderField(field: keyof IOrderForm, value: string) {
+		this.order[field] = value;
 
 		if (this.validateOrder()) {
 			this.events.emit('order:ready', this.order);
 		}
 	}
 
+	setContactsField(field: keyof IContacts, value: string) {
+		this.order[field] = value;
+		console.log(field, value);
+		if (this.validateContacts()) {
+			this.events.emit('contacts:ready', this.order);
+		}
+	}
+
 	validateOrder() {
-		const errors: typeof this.formErrors = {};
-		if (!this.order.email) {
-			errors.email = 'Необходимо указать email';
-		}
-		if (!this.order.phone) {
-			errors.phone = 'Необходимо указать телефон';
-		}
+		const errors: typeof this.formOrderErrors = {};
 		if (!this.order.address) {
 			errors.address = 'Необходимо указать адрес';
 		}
-		this.formErrors = errors;
-		this.events.emit('formErrors:change', this.formErrors);
+		this.formOrderErrors = errors;
+		this.events.emit('formOrderErrors:change', this.formOrderErrors);
+		return Object.keys(errors).length === 0;
+	}
+
+	validateContacts() {
+		const errors: typeof this.formContactsErrors = {};
+		console.log(this.order);
+
+		if (!this.order.phone) {
+			errors.phone = 'Необходимо указать телефон';
+		}
+
+		if (!this.order.email) {
+			errors.email = 'Необходимо указать почту';
+		}
+		this.formContactsErrors = errors;
+		this.events.emit('formContactsErrors:change', this.formContactsErrors);
 		return Object.keys(errors).length === 0;
 	}
 

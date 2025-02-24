@@ -9,16 +9,17 @@ export interface IOrderResult {
 export type Payment = 'online' | 'offline';
 
 export interface IOrderForm {
-	payment: Payment;
-	email: string;
+	address: string;
 }
 
 export interface IContacts {
 	phone: string;
-	address: string;
+	email: string;
 }
 
 export interface IOrder extends IOrderForm, IContacts {
+	payment: Payment;
+	total: number;
 	items: string[];
 }
 
@@ -29,7 +30,8 @@ export interface IAppState {
 	loading: boolean;
 }
 
-export type formErrors = Partial<Record<keyof IOrder, string>>;
+export type formOrderErrors = Partial<Record<keyof IOrderForm, string>>;
+export type formContactsErrors = Partial<Record<keyof IContacts, string>>;
 
 export interface IProductList {
 	total: number;

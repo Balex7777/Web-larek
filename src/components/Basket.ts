@@ -21,7 +21,7 @@ export class Basket extends Component<IBasketView> {
 
 		if (this._submit) {
 			this._submit.addEventListener('click', () => {
-				console.log('submit');
+				this.events.emit('order:open');
 			});
 		}
 	}
