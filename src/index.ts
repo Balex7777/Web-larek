@@ -9,18 +9,17 @@ import { Contacts } from './components/Contacts';
 import { LarekAPI } from './components/LarekAPI';
 import { Order } from './components/Order';
 import { Page } from './components/Page';
-import { IProduct } from './components/Product';
 import './scss/styles.scss';
-import { IContacts, IOrderForm, IProductList } from './types';
+import { IContacts, IOrderForm, IProduct, IProductList } from './types';
 import { API_URL, CDN_URL } from './utils/constants';
 import { cloneTemplate, createElement, ensureElement } from './utils/utils';
 
 const events = new EventEmitter();
 const api = new LarekAPI(CDN_URL, API_URL);
 
-// events.onAll(({ eventName, data }) => {
-// 	console.log(eventName, data);
-// });
+events.onAll(({ eventName, data }) => {
+	console.log(eventName, data);
+});
 
 const successTemplate = ensureElement<HTMLTemplateElement>('#success');
 const cardCatalogTemplate = ensureElement<HTMLTemplateElement>('#card-catalog');

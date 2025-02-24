@@ -1,7 +1,7 @@
+import { IProduct } from '../types';
 import { Component } from './base/Component';
 import { IEvents } from './base/events';
 import { IBasketView } from './Basket';
-import { IProduct } from './Product';
 
 export interface IPage {
 	counter: number;

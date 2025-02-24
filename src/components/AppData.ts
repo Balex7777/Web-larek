@@ -5,11 +5,11 @@ import {
 	IContacts,
 	IOrder,
 	IOrderForm,
+	IProduct,
 	IProductList,
 } from '../types';
 import { Model } from './base/Model';
 import { IBasketElement } from './BasketElement';
-import { IProduct } from './Product';
 import _ from 'lodash';
 
 export class ProductItem extends Model<IProduct> {
