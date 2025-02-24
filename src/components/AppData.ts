@@ -10,7 +10,6 @@ import {
 } from '../types';
 import { Model } from './base/Model';
 import { IBasketElement } from './BasketElement';
-import _ from 'lodash';
 
 export class ProductItem extends Model<IProduct> {
 	id: string;
@@ -48,14 +47,6 @@ export class AppState extends Model<IAppState> {
 		console.log(products);
 		this.gallery = products.items.map((product) => new ProductItem(product, this.events));
 		this.emitChanges('items:changed', { gallery: this.gallery });
-	}
-
-	toggleOrderedProduct(id: string, isIncluded: boolean) {
-		if (isIncluded) {
-			this.order.items = _.uniq([...this.order.items, id]);
-		} else {
-			this.order.items = _.without(this.order.items, id);
-		}
 	}
 
 	addProduct(item: IBasketElement) {
