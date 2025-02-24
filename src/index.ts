@@ -73,16 +73,15 @@ events.on('contacts:submit', () => {
 			const success = new Success(cloneTemplate(successTemplate), {
 				onClick: () => {
 					modal.close();
-					appData.clearBasket();
-					page.counter = 0;
 				},
 			});
-
 			success.setTotal(result.total);
-
 			modal.render({
 				content: success.render({}),
 			});
+
+			appData.clearBasket();
+			page.counter = 0;
 		})
 		.catch((err) => {
 			console.error(err);
