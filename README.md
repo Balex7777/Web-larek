@@ -52,4 +52,4 @@ yarn build
 ## 🌐 **GitHub Pages**
 
 Проект доступен по ссылке:
-https://github.com/Balex7777/Web-larek
+https://balex7777.github.io/Web-larek/
