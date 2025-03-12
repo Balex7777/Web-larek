@@ -48,3 +48,8 @@ npm run build
 ```
 yarn build
 ```
+
+## 🌐 **GitHub Pages**
+
+Проект доступен по ссылке:
+https://github.com/Balex7777/Web-larek
