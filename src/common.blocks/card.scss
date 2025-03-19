@@ -8,11 +8,6 @@
 	background-color: $primary;
 	color: white;
 	padding: $defaultPadding;
-	align-items: flex-start;
-
-	@media (max-width: 1335px) {
-		align-items: stretch;
-	}
 
 	&_full {
 		flex-direction: row;
